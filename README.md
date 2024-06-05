@@ -13,7 +13,7 @@
 ## Data Pretreatment
 In clinical pretreatment, we first generate a text report in Text_Builder.py and then attempt to feature it through Clinicalbert.
 
-In image pretreatment, we upsample the image and remove the skull in CT_pretreatment.py
+In image pretreatment, we use window, skull stripping, registration and voxel size in CT_Preprocessing.py
 
 
 ## Train
