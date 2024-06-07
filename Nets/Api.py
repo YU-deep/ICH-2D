@@ -27,6 +27,7 @@ def get_bar_delta(bar):
         v2t += delta(vision, text)
     return t2t, v2v, t2v, v2t
 
+# run our net
 def run_net(vision_encoder, text_encoder, cross_attn, self_attn, text_trt, vision_trt, classify, device, epochs, data_loader,
             optimizer, loss_function_id, fusion_structure_id, batch_size):
     """
@@ -88,6 +89,7 @@ def run_net(vision_encoder, text_encoder, cross_attn, self_attn, text_trt, visio
                 text_feature = text_trt(text_feature)
                 vision_feature = vision_trt(vision_feature)
 
+                # choose fusion structure
                 if fusion_structure_id == 0:
                     #ours fusion structure
                     cross_feature, _, _ = cross_attn(text_feature, vision_feature)
@@ -109,6 +111,7 @@ def run_net(vision_encoder, text_encoder, cross_attn, self_attn, text_trt, visio
 
                 outputs = classify(feature)
 
+                # chosse loss function
                 if loss_function_id == 0:
                     # ours VTMF Loss
                     IMIMA = Intra_Modality_and_Inter_Modality_Alignment_Loss(t2t, v2v, t2v,v2t)
