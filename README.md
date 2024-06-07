@@ -20,6 +20,7 @@ You could train the model through the following command:
 ```
 python train.py
 ```
+After training, the models will be saved in a new folder.
 
 ## Usages
 For more detailed usage, you can refer to our code and annotation.
