@@ -59,15 +59,16 @@ def preprocess_nii(img_path):
     sitkImage = intensityWindowingFilter.Execute(sitkImage)
     return sitkImage
 
-def remove_skull(path):
+def remove_skull(image):
     """
     Removes the skull part from the CT image.
     
     Parameters:
-    path (str): Path to the NIfTI image file.
+    image (sitk.Image): The preprocessed image.
+    
+    Returns:
+    sitk.Image: The skull-stripped image.
     """
-    # Load and preprocess the image
-    image = preprocess_nii(path)
     data = sitk.GetArrayFromImage(image)
 
     # Thresholding to isolate skull
@@ -86,7 +87,7 @@ def remove_skull(path):
     # Save the image
     skull_stripped_image = sitk.GetImageFromArray(skull_stripped_data)
     skull_stripped_image.CopyInformation(image)
-    sitk.WriteImage(skull_stripped_image, path)
+    return skull_stripped_image
 
 
 def register_to_template(image, template):
@@ -124,7 +125,6 @@ def register_to_template(image, template):
     registered_image = sitk.Resample(image, template, final_transform, sitk.sitkLinear, 0.0, image.GetPixelID())
     
     return registered_image
-
 
 
 def get_mean_and_std(good_path, bad_path):
@@ -170,13 +170,34 @@ def get_mean_and_std(good_path, bad_path):
     return mean, std
 
 
-def preprocess(raw_img_in, template_img_path):
+def normalize_image(image, mean, std):
     """
-    Integrates all preprocessing steps: intensity windowing, skull stripping, and registration.
+    Normalizes the image using the provided mean and standard deviation.
+    
+    Parameters:
+    image (sitk.Image): The image to be normalized.
+    mean (float): The mean value for normalization.
+    std (float): The standard deviation value for normalization.
+    
+    Returns:
+    sitk.Image: The normalized image.
+    """
+    img_array = sitk.GetArrayFromImage(image)
+    normalized_array = (img_array - mean) / std
+    normalized_image = sitk.GetImageFromArray(normalized_array)
+    normalized_image.CopyInformation(image)
+    return normalized_image
+
+
+def preprocess(raw_img_in, template_img_path, mean, std):
+    """
+    Integrates all preprocessing steps: intensity windowing, skull stripping, registration, and normalization.
     
     Parameters:
     raw_img_in (str): Path to the raw input NIfTI image.
     template_img_path (str): Path to the template image for registration.
+    mean (float): The mean value for normalization.
+    std (float): The standard deviation value for normalization.
     
     Returns:
     sitk.Image: The fully preprocessed image.
@@ -193,7 +214,15 @@ def preprocess(raw_img_in, template_img_path):
     # Register the skull stripped image to the template
     registered_img = register_to_template(skull_stripped_img, template_img)
     
-    return registered_img
+    # Normalize the registered image
+    normalized_img = normalize_image(registered_img, mean, std)
+    
+    return normalized_img
+
 
 # Example usage
-img_out = preprocess('path_to_raw_image.nii', 'path_to_template_image.nii')
+good_path = 'path_to_good_images'
+bad_path = 'path_to_bad_images'
+mean, std = get_mean_and_std(good_path, bad_path)
+
+img_out = preprocess('path_to_raw_image.nii', 'path_to_template_image.nii', mean, std)
