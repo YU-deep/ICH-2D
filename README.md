@@ -13,7 +13,10 @@
 ## Data Pretreatment
 In clinical pretreatment, we first generate a text report in Text_Builder.py and then attempt to feature it through Clinicalbert.
 
-In image pretreatment, we implement a size change and window adjustment, make skull stripping and registration and get information on voxel size in CT_Preprocessing.py
+In image pretreatment, we implement a size change and window adjustment, make skull stripping and registration and get information on voxel size in CT_Preprocessing.py by the following command:
+```
+python Utils/CT_Preprocessing.py
+```
 
 ## Train
 You could train the model through the following command:
