@@ -17,6 +17,7 @@ In image pretreatment, we implement a size change and window adjustment, make sk
 ```
 python Utils/CT_Preprocessing.py
 ```
+The template and image are parameters that users need to pass in themselves.
 
 ## Train
 You could train the model through the following command:
