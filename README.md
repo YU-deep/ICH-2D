@@ -17,14 +17,16 @@ In image pretreatment, we implement a size change and window adjustment, make sk
 ```
 python Utils/CT_Preprocessing.py
 ```
-The template and image are parameters that users need to pass in themselves.
+In the process of data preprocessing, we perform window size setting, skull removal, template registration, and normalization operations on the original image by turn.
+Among them, the original image path and image template need to be provided by the user themselves.
+
 
 ## Train
 You could train the model through the following command:
 ```
 python train.py
 ```
-After training, the models will be saved in a new folder.
+In the process of training, we sequentially initialized the model, read in the data, trained and verified it with a 5-fold crossover, validated the evaluation mode, and saved the model.
 
 ## Usages
 For more detailed usage, you can refer to our code and annotation.
