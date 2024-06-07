@@ -168,3 +168,32 @@ def get_mean_and_std(good_path, bad_path):
     std = (a / (good_len + bad_len - 1)) ** 0.5
     
     return mean, std
+
+
+def preprocess(raw_img_in, template_img_path):
+    """
+    Integrates all preprocessing steps: intensity windowing, skull stripping, and registration.
+    
+    Parameters:
+    raw_img_in (str): Path to the raw input NIfTI image.
+    template_img_path (str): Path to the template image for registration.
+    
+    Returns:
+    sitk.Image: The fully preprocessed image.
+    """
+    # Preprocess the image (intensity windowing and resampling)
+    preprocessed_img = preprocess_nii(raw_img_in)
+    
+    # Remove skull from the image
+    skull_stripped_img = remove_skull(preprocessed_img)
+    
+    # Read the template image
+    template_img = sitk.ReadImage(template_img_path)
+    
+    # Register the skull stripped image to the template
+    registered_img = register_to_template(skull_stripped_img, template_img)
+    
+    return registered_img
+
+# Example usage
+img_out = preprocess('path_to_raw_image.nii', 'path_to_template_image.nii')
