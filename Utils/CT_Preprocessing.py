@@ -83,11 +83,6 @@ def remove_skull(image):
     brain_mask = label_image == largest_label
 
     skull_stripped_data = data * brain_mask
-
-    for i in range(32):
-        for j in range(512):
-            for k in range(512):
-                skull_stripped_data[i][j][k]=(skull_stripped_data[i][j][k]-2.4908)/6.2173
                 
     skull_stripped_image = sitk.GetImageFromArray(skull_stripped_data)
     skull_stripped_image.CopyInformation(image)
