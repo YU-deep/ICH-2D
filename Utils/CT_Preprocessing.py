@@ -4,32 +4,36 @@ import scipy.ndimage as ndimage
 import SimpleITK as sitk
 
 
-def resampleSize(sitkImage, depth):
+def resample_size(sitk_image, depth):
     """
     Resamples the image to the specified depth.
     
     Parameters:
-    sitkImage (sitk.Image): The SimpleITK image.
+    sitk_image (sitk.Image): The SimpleITK image.
     depth (int): Target depth.
     
     Returns:
     sitk.Image: The resampled image.
     """
-    euler2d = sitk.Euler2DTransform()  # 2D Euler transform for rigid registration
-    width, height = sitkImage.GetSize()
-    xspacing, yspacing = sitkImage.GetSpacing()
-    new_spacing_y = yspacing / (depth / float(height))
+    euler3d = sitk.Euler3DTransform()  # 3D Euler transform for rigid registration
+    size = sitk_image.GetSize()
+    spacing = sitk_image.GetSpacing()
     
-    origin = sitkImage.GetOrigin()
-    direction = sitkImage.GetDirection()
+    width, height, _ = size
+    xspacing, yspacing, zspacing = spacing
+    print(spacing)
+    new_spacing_z = zspacing / (depth / float(height))
+    print(new_spacing_z)
+    origin = sitk_image.GetOrigin()
+    direction = sitk_image.GetDirection()
     
     # Calculate new size based on new spacing
-    newsize = (width, depth)
-    newspace = (xspacing, new_spacing_y)
+    new_size = (width, height, depth)
+    new_spacing = (xspacing, yspacing, new_spacing_z)
     
     # Perform resampling
-    sitkImage = sitk.Resample(sitkImage, newsize, euler2d, sitk.sitkNearestNeighbor, origin, newspace, direction)
-    return sitkImage
+    sitk_image = sitk.Resample(sitk_image, new_size, euler3d, sitk.sitkNearestNeighbor, origin, new_spacing, direction)
+    return sitk_image
 
 
 def preprocess_nii(img_path):
@@ -72,7 +76,7 @@ def remove_skull(image):
     data = sitk.GetArrayFromImage(image)
 
     # Thresholding to isolate skull
-    threshold = 50
+    threshold = 25
     binary_image = data < threshold
 
     binary_image = ndimage.binary_opening(binary_image)
@@ -87,42 +91,6 @@ def remove_skull(image):
     skull_stripped_image = sitk.GetImageFromArray(skull_stripped_data)
     skull_stripped_image.CopyInformation(image)
     return skull_stripped_image
-
-def register_to_template(image, template):
-    """
-    Registers an image to a template using affine registration.
-    
-    Parameters:
-    image (sitk.Image): The image to be registered.
-    template (sitk.Image): The template image for registration.
-    
-    Returns:
-    sitk.Image: The registered image.
-    """
-    # Initialize the registration method
-    registration_method = sitk.ImageRegistrationMethod()
-    
-    # Set the metric and optimizer
-    registration_method.SetMetricAsMeanSquares()
-    registration_method.SetOptimizerAsRegularStepGradientDescent(learningRate=1.0,
-                                                                 minStep=1e-4,
-                                                                 numberOfIterations=200,
-                                                                 gradientMagnitudeTolerance=1e-8)
-    
-    # Set the initial transform
-    initial_transform = sitk.CenteredTransformInitializer(template,
-                                                          image,
-                                                          sitk.AffineTransform(template.GetDimension()))
-    
-    registration_method.SetInitialTransform(initial_transform)
-    
-    # Perform the registration
-    final_transform = registration_method.Execute(template, image)
-    
-    # Resample the image
-    registered_image = sitk.Resample(image, template, final_transform, sitk.sitkLinear, 0.0, image.GetPixelID())
-    
-    return registered_image
 
 
 def get_mean_and_std(good_path, bad_path):
@@ -187,7 +155,7 @@ def normalize_image(image, mean, std):
     return normalized_image
 
 
-def preprocess(raw_img_in, template_img_path, mean, std):
+def preprocess(raw_img_in, mean, std):
     """
     Integrates all preprocessing steps: intensity windowing, skull stripping, registration, and normalization.
     
@@ -206,14 +174,8 @@ def preprocess(raw_img_in, template_img_path, mean, std):
     # Remove skull from the image
     skull_stripped_img = remove_skull(preprocessed_img)
     
-    # Read the template image
-    template_img = sitk.ReadImage(template_img_path)  # Assumes .mha file is provided here
-    
-    # Register the skull stripped image to the template
-    registered_img = register_to_template(skull_stripped_img, template_img)
-    
     # Normalize the registered image
-    normalized_img = normalize_image(registered_img, mean, std)
+    normalized_img = normalize_image(skull_stripped_img, mean, std)
     
     return normalized_img
 
@@ -223,4 +185,4 @@ good_path = 'path_to_good_images'
 bad_path = 'path_to_bad_images'
 mean, std = get_mean_and_std(good_path, bad_path)
 
-img_out = preprocess('path_to_raw_image.nii', 'atlasImage.mha', mean, std)  # mean = 2.4908, std = 6.2173
+img_out = preprocess('path_to_raw_image.nii', mean, std)  # mean = 2.4908, std = 6.2173
