@@ -209,7 +209,7 @@ def preprocess(raw_img_in, template_img_path, mean, std):
     skull_stripped_img = remove_skull(preprocessed_img)
     
     # Read the template image
-    template_img = sitk.ReadImage(template_img_path)
+    template_img = sitk.ReadImage(template_img_path) 
     
     # Register the skull stripped image to the template
     registered_img = register_to_template(skull_stripped_img, template_img)
@@ -225,4 +225,4 @@ good_path = 'path_to_good_images'
 bad_path = 'path_to_bad_images'
 mean, std = get_mean_and_std(good_path, bad_path)
 
-img_out = preprocess('path_to_raw_image.nii', 'path_to_template_image.nii', mean, std)
+img_out = preprocess('path_to_raw_image.nii', 'atlasImage.mha', mean, std)
