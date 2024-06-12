@@ -209,7 +209,7 @@ def preprocess(raw_img_in, template_img_path, mean, std):
     skull_stripped_img = remove_skull(preprocessed_img)
     
     # Read the template image
-    template_img = sitk.ReadImage(template_img_path) 
+    template_img = sitk.ReadImage(template_img_path)  # Assumes .mha file is provided here
     
     # Register the skull stripped image to the template
     registered_img = register_to_template(skull_stripped_img, template_img)
