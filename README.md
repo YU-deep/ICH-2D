@@ -22,7 +22,6 @@ Among them, the original image path and image template need to be provided by th
 The the image resolution is (32,512,512) and voxel size is (0.488,0.488,1.0)
 
 
-![alt]('/remove_skull.png')
 
 ## Train
 You could train the model through the following command:
