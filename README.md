@@ -20,7 +20,7 @@ python Utils/CT_Preprocessing.py
 In the process of data preprocessing, we perform window size setting, skull removal, template registration, and normalization operations on the original image by turn.
 Among them, the original image path and image template need to be provided by the user themselves.
 
-![](remove_skull.png)
+![alt](/remove_skull.png)
 
 ## Train
 You could train the model through the following command:
