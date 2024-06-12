@@ -72,23 +72,26 @@ def remove_skull(image):
     data = sitk.GetArrayFromImage(image)
 
     # Thresholding to isolate skull
-    threshold = 400
-    binary_image = data > threshold
+    threshold = 50
+    binary_image = data < threshold
 
-    # Binary closing to connect skull regions
-    binary_image = ndimage.binary_closing(binary_image)
+    binary_image = ndimage.binary_opening(binary_image)
+    label_image, num_labels = ndimage.label(binary_image)
 
-    # Invert the binary image to get the skull part
-    skull_mask = np.logical_not(binary_image)
+    largest_label = np.argmax(np.bincount(label_image.flat)[1:]) + 1
 
-    # Apply mask to the image
-    skull_stripped_data = data * skull_mask
+    brain_mask = label_image == largest_label
 
-    # Save the image
+    skull_stripped_data = data * brain_mask
+
+    for i in range(32):
+        for j in range(512):
+            for k in range(512):
+                skull_stripped_data[i][j][k]=(skull_stripped_data[i][j][k]-2.4908)/6.2173
+                
     skull_stripped_image = sitk.GetImageFromArray(skull_stripped_data)
     skull_stripped_image.CopyInformation(image)
     return skull_stripped_image
-
 
 def register_to_template(image, template):
     """
