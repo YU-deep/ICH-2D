@@ -228,4 +228,4 @@ good_path = 'path_to_good_images'
 bad_path = 'path_to_bad_images'
 mean, std = get_mean_and_std(good_path, bad_path)
 
-img_out = preprocess('path_to_raw_image.nii', 'atlasImage.mha', mean, std)
+img_out = preprocess('path_to_raw_image.nii', 'atlasImage.mha', mean, std)  # mean = 2.4908, std = 6.2173
