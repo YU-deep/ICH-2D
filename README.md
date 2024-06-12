@@ -19,8 +19,10 @@ python Utils/CT_Preprocessing.py
 ```
 In the process of data preprocessing, we perform window size setting, skull removal, template registration, and normalization operations on the original image by turn.
 Among them, the original image path and image template need to be provided by the user themselves.
+The the image resolution is (32,512,512) and voxel size is (0.488,0.488,1.0)
 
-![alt](/remove_skull.png)
+
+![alt]('/remove_skull.png')
 
 ## Train
 You could train the model through the following command:
