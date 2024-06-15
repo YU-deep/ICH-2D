@@ -18,7 +18,7 @@ In image pretreatment, we implement a size change and window adjustment, make sk
 python Utils/CT_Preprocessing.py
 ```
 In the process of data preprocessing, we perform window size setting, skull removal and normalization operations on the original image by turn.
-Among them, the original image path needs to be provided by the user themselves.
+Among them, the original image path needs to be provided by the user themselves. The voxel size in mm of of images is (0.488,0.488,6).
 
 
 ## Train
